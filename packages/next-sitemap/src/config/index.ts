@@ -17,13 +17,13 @@ export const loadConfig = (path: string): IConfig => {
 export const transformSitemap = (
   config: IConfig,
   url: string
-): ISitemapFiled => {
-  return {
+): Promise<ISitemapFiled> => {
+  return Promise.resolve({
     loc: url,
     changefreq: config?.changefreq,
     priority: config?.priority,
     lastmod: config?.autoLastmod ? new Date().toISOString() : undefined,
-  }
+  })
 }
 
 export const defaultConfig: Partial<IConfig> = {

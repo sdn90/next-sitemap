@@ -62,7 +62,7 @@ describe('next-sitemap/config', () => {
     })
   })
 
-  test('withDefaultConfig: default transformation', () => {
+  test('withDefaultConfig: default transformation', async () => {
     const myConfig = withDefaultConfig({
       sourceDir: 'custom-source',
       generateRobotsTxt: true,
@@ -79,7 +79,7 @@ describe('next-sitemap/config', () => {
       },
     })
 
-    const value = myConfig.transform!(myConfig, 'https://example.com')
+    const value = await myConfig.transform!(myConfig, 'https://example.com')
 
     expect(value).toStrictEqual({
       loc: 'https://example.com',
@@ -89,7 +89,7 @@ describe('next-sitemap/config', () => {
     })
   })
 
-  test('withDefaultConfig: custom transformation', () => {
+  test('withDefaultConfig: custom transformation', async () => {
     const myConfig = withDefaultConfig({
       sourceDir: 'custom-source',
       generateRobotsTxt: true,
@@ -97,11 +97,11 @@ describe('next-sitemap/config', () => {
       exclude: ['1', '2'],
       priority: 0.6,
       changefreq: 'weekly',
-      transform: (): ISitemapFiled => {
-        return {
+      transform: (): Promise<ISitemapFiled> => {
+        return Promise.resolve({
           loc: 'something-else',
           lastmod: 'lastmod-cutom',
-        }
+        })
       },
       robotsTxtOptions: {
         policies: [],
@@ -113,7 +113,7 @@ describe('next-sitemap/config', () => {
     })
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const value = myConfig.transform!(myConfig, 'https://example.com')
+    const value = await myConfig.transform!(myConfig, 'https://example.com')
 
     expect(value).toStrictEqual({
       loc: 'something-else',

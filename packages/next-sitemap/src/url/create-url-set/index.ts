@@ -22,10 +22,10 @@ export const absoluteUrl = (
  * @param config
  * @param manifest
  */
-export const createUrlSet = (
+export const createUrlSet = async (
   config: IConfig,
   manifest: INextManifest
-): ISitemapFiled[] => {
+): Promise<ISitemapFiled[]> => {
   let allKeys = [
     ...Object.keys(manifest.build.pages),
     ...(manifest.preRender ? Object.keys(manifest.preRender.routes) : []),
@@ -41,9 +41,16 @@ export const createUrlSet = (
 
   urlSet = [...new Set(urlSet)]
 
+  const transformedSitemapFields: any[] = []
   // Create sitemap fields based on transformation
-  const sitemapFields = urlSet
-    .map((url) => config.transform!(config, url)) // transform using relative urls
+  for (const url of urlSet) {
+    if (config.transform) {
+      let transformedUrl = await config.transform!(config, url)
+      transformedSitemapFields.push(transformedUrl)
+    }
+  }
+
+  const sitemapFields = transformedSitemapFields
     .filter((x) => Boolean(x) && Boolean(x.loc)) // remove null values
     .map((x) => ({
       ...x,
